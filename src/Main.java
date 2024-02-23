@@ -1,17 +1,37 @@
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
+import java.security.KeyPairGenerator;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import javax.crypto.Cipher;
+import java.util.Base64;
+
 public class Main {
-    public static void main(String[] args) {
-        // Press Alt+Intro with your caret at the highlighted text to see how
-        // IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+    public static void main(String[] args) throws Exception {
+        // Generar el par de claves pública y privada
+        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA");
+        keyPairGen.initialize(2048);
+        KeyPair pair = keyPairGen.generateKeyPair();
+        PrivateKey privateKey = pair.getPrivate();
+        PublicKey publicKey = pair.getPublic();
 
-        // Press Mayús+F10 or click the green arrow button in the gutter to run the code.
-        for (int i = 1; i <= 5; i++) {
+        // Inicializar un mensaje
+        String originalMessage = "Este es un mensaje secreto";
 
-            // Press Mayús+F9 to start debugging your code. We have set one breakpoint
-            // for you, but you can always add more by pressing Ctrl+F8.
-            System.out.println("i = " + i);
-        }
+        // Encriptación
+        Cipher encryptCipher = Cipher.getInstance("RSA");
+        encryptCipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        byte[] encryptedMessageBytes = encryptCipher.doFinal(originalMessage.getBytes());
+        String encryptedMessage = Base64.getEncoder().encodeToString(encryptedMessageBytes);
+
+        // Desencriptación
+        Cipher decryptCipher = Cipher.getInstance("RSA");
+        decryptCipher.init(Cipher.DECRYPT_MODE, privateKey);
+        byte[] decryptedMessageBytes = decryptCipher.doFinal(Base64.getDecoder().decode(encryptedMessage));
+        String decryptedMessage = new String(decryptedMessageBytes);
+
+        // Resultados
+        System.out.println("Mensaje original: " + originalMessage);
+        System.out.println("Mensaje encriptado: " + encryptedMessage);
+        System.out.println("Mensaje desencriptado: " + decryptedMessage);
     }
 }
